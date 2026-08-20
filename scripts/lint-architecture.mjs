@@ -116,7 +116,7 @@ function getAllSourceFiles(dir, fileList = []) {
       if (file !== 'node_modules' && file !== '.git' && file !== 'dist') {
         getAllSourceFiles(fullPath, fileList);
       }
-    } else if (file.endsWith('.ts') || file.endsWith('.tsx')) {
+    } else if ((file.endsWith('.ts') || file.endsWith('.tsx')) && !file.endsWith('.gen.ts')) {
       fileList.push(fullPath);
     }
   }
@@ -129,7 +129,7 @@ function getStagedFiles() {
     return stdout
       .split('\n')
       .map(f => f.trim())
-      .filter(f => f && f.startsWith('src/') && (f.endsWith('.ts') || f.endsWith('.tsx')))
+      .filter(f => f && f.startsWith('src/') && (f.endsWith('.ts') || f.endsWith('.tsx')) && !f.endsWith('.gen.ts'))
       .map(f => path.resolve(process.cwd(), f));
   } catch {
     return [];
