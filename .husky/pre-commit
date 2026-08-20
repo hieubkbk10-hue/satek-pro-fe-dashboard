@@ -1,0 +1,26 @@
+#!/bin/sh
+echo "🛡️  [QUALITY GATE 1/4] Prettier Format Check..."
+npx prettier --check "src/**/*.{ts,tsx,css,json}" || {
+  echo "❌ Lỗi: Định dạng chưa chuẩn Prettier 2-space. Hãy chạy 'npm run format'."
+  exit 1
+}
+
+echo "🛡️  [QUALITY GATE 2/4] AST Architecture Linter (80 Rules)..."
+node scripts/lint-architecture.mjs --staged || {
+  echo "❌ Lỗi: Vi phạm quy chuẩn kiến trúc FE-ARCH."
+  exit 1
+}
+
+echo "🛡️  [QUALITY GATE 3/4] TypeScript Typecheck..."
+npx tsc --noEmit || {
+  echo "❌ Lỗi: Phát hiện lỗi kiểu dữ liệu TypeScript."
+  exit 1
+}
+
+echo "🛡️  [QUALITY GATE 4/4] Smoke Build Test..."
+npm run build || {
+  echo "❌ Lỗi: Build production thất bại."
+  exit 1
+}
+
+echo "✅ All Quality Gates Passed!"

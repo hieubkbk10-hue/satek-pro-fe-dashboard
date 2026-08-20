@@ -1,0 +1,5 @@
+#!/bin/sh
+npx --no -- commitlint --edit "$1" || {
+  echo "❌ Lỗi: Commit message không tuân thủ Conventional Commits (ví dụ: feat: ..., fix: ...)"
+  exit 1
+}
