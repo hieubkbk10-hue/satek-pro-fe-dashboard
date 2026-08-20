@@ -1,25 +1,42 @@
 /**
  * @file ClientWalletView.tsx
- * @description Client Satek Pay Wallet, QR Code Deposit & Transactions History View
+ * @description Client Satek Pay Wallet View with TanStack Query and Deposit Mutation
  */
 import * as React from 'react';
 import { QrCode, ArrowDownRight, ArrowUpRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { TransactionRecord, WalletBalance } from '@/types';
-import { MOCK_CLIENT_WALLET_BALANCE, MOCK_CLIENT_TRANSACTIONS } from '@/mocks';
+import {
+  useWalletBalanceQuery,
+  useWalletTransactionsQuery,
+  useDepositWalletMutation,
+} from '@/hooks';
 import { DataTable, ColumnDefinition, Badge, Button, AppDialog } from '@/components/common';
 import { formatVND } from '@/utils';
-import { toast } from 'sonner';
 
 export function ClientWalletView(): React.JSX.Element {
-  const [balance] = React.useState<WalletBalance>(MOCK_CLIENT_WALLET_BALANCE);
-  const [transactions] = React.useState<TransactionRecord[]>(MOCK_CLIENT_TRANSACTIONS);
+  const { data: balanceData, isLoading: isBalanceLoading } = useWalletBalanceQuery();
+  const { data: txData, isLoading: isTxLoading } = useWalletTransactionsQuery();
+  const depositMutation = useDepositWalletMutation();
+
+  const balance: WalletBalance = balanceData || {
+    currentBalance: 5000000,
+    currency: 'VND',
+    totalDeposited: 25000000,
+    totalSpent: 20000000,
+  };
+
+  const transactions: TransactionRecord[] = txData || [];
+
   const [isDepositModalOpen, setIsDepositModalOpen] = React.useState<boolean>(false);
   const [depositAmount, setDepositAmount] = React.useState<string>('2000000');
 
   const handleCreateQr = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsDepositModalOpen(false);
-    toast.success(`Đã tạo mã QR nạp ${formatVND(Number(depositAmount))} thành công!`);
+    depositMutation.mutate(Number(depositAmount), {
+      onSuccess: () => {
+        setIsDepositModalOpen(false);
+      },
+    });
   };
 
   const columns: ColumnDefinition<TransactionRecord>[] = [
@@ -90,9 +107,13 @@ export function ClientWalletView(): React.JSX.Element {
             <p className="mt-4 text-xs font-bold uppercase tracking-wider text-slate-400">
               SỐ DƯ KHẢ DỤNG
             </p>
-            <p className="mt-1 text-4xl font-black tracking-tight text-white">
-              {formatVND(balance.currentBalance)}
-            </p>
+            {isBalanceLoading ? (
+              <div className="mt-1 h-10 w-48 animate-pulse rounded-lg bg-slate-700" />
+            ) : (
+              <p className="mt-1 text-4xl font-black tracking-tight text-white">
+                {formatVND(balance.currentBalance)}
+              </p>
+            )}
           </div>
 
           <div className="mt-6 flex flex-col justify-between gap-4 border-t border-slate-700/60 pt-6 sm:flex-row sm:items-center">
@@ -143,7 +164,12 @@ export function ClientWalletView(): React.JSX.Element {
       {/* Transaction History Section */}
       <div className="space-y-4">
         <h3 className="text-base font-bold text-slate-900">Lịch Sử Biến Động Số Dư</h3>
-        <DataTable columns={columns} data={transactions} keyExtractor={(row) => row.id} />
+        <DataTable
+          columns={columns}
+          data={transactions}
+          keyExtractor={(row) => row.id}
+          isLoading={isTxLoading}
+        />
       </div>
 
       {/* Deposit QR Modal */}
@@ -184,10 +210,21 @@ export function ClientWalletView(): React.JSX.Element {
           </div>
 
           <div className="flex justify-end space-x-2 pt-2">
-            <Button variant="outline" size="sm" onClick={() => setIsDepositModalOpen(false)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsDepositModalOpen(false)}
+              disabled={depositMutation.isPending}
+            >
               Hủy bỏ
             </Button>
-            <Button type="submit" variant="primary" size="sm" className="font-bold">
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              isLoading={depositMutation.isPending}
+              className="font-bold"
+            >
               Xác nhận đã chuyển khoản
             </Button>
           </div>

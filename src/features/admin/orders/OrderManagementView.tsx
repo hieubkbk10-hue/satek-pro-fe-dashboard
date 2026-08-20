@@ -1,11 +1,11 @@
 /**
  * @file OrderManagementView.tsx
- * @description Admin Orders, Auto Renewals & Refunds Management View
+ * @description Admin Orders, Auto Renewals & Refunds Management View with Query Hook
  */
 import * as React from 'react';
 import { Eye, FileText } from 'lucide-react';
 import { OrderRecord } from '@/types';
-import { MOCK_ADMIN_ORDERS } from '@/mocks';
+import { useOrdersQuery } from '@/hooks';
 import { FilterSearchHeader, FilterOption } from '@/components/molecular';
 import {
   DataTable,
@@ -19,15 +19,17 @@ import { formatVND } from '@/utils';
 import { toast } from 'sonner';
 
 export function OrderManagementView(): React.JSX.Element {
+  const { data: queriedOrders, isLoading } = useOrdersQuery();
+  const orders: OrderRecord[] = queriedOrders || [];
+
   const [activeTab, setActiveTab] = React.useState<string>('orders');
   const [searchValue, setSearchValue] = React.useState<string>('');
   const [activeFilter, setActiveFilter] = React.useState<string>('all');
-  const [orders] = React.useState<OrderRecord[]>(MOCK_ADMIN_ORDERS);
   const [selectedOrder, setSelectedOrder] = React.useState<OrderRecord | null>(null);
   const [isDetailOpen, setIsDetailOpen] = React.useState<boolean>(false);
 
   const tabs = [
-    { id: 'orders', label: 'Tất cả đơn hàng', count: 4 },
+    { id: 'orders', label: 'Tất cả đơn hàng', count: orders.length },
     { id: 'renewals', label: 'Gia hạn tự động', count: 2 },
     { id: 'refunds', label: 'Yêu cầu hoàn tiền', count: 0 },
   ];
@@ -118,7 +120,7 @@ export function OrderManagementView(): React.JSX.Element {
           variant="outline"
           size="sm"
           onClick={() => handleOpenDetail(row)}
-          className="gap-1 border-slate-200 text-xs hover:border-primary hover:text-primary"
+          className="cursor-pointer gap-1 border-slate-200 text-xs hover:border-primary hover:text-primary"
         >
           <Eye className="h-3.5 w-3.5" />
           <span>Chi tiết</span>
@@ -144,7 +146,12 @@ export function OrderManagementView(): React.JSX.Element {
 
       <TabsBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <DataTable columns={columns} data={filteredOrders} keyExtractor={(row) => row.id} />
+      <DataTable
+        columns={columns}
+        data={filteredOrders}
+        keyExtractor={(row) => row.id}
+        isLoading={isLoading}
+      />
 
       {/* Order Detail Dialog */}
       {selectedOrder && (
@@ -188,7 +195,7 @@ export function OrderManagementView(): React.JSX.Element {
                   setIsDetailOpen(false);
                   toast.success('Đã gửi lại email xác nhận đơn hàng!');
                 }}
-                className="gap-1.5 font-bold"
+                className="cursor-pointer gap-1.5 font-bold"
               >
                 <FileText className="h-4 w-4" />
                 Xuất Hóa Đơn VAT

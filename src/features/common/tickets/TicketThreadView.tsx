@@ -1,25 +1,38 @@
 /**
  * @file TicketThreadView.tsx
- * @description 2-Way Interactive Technical Support Ticket Thread & Chat View
+ * @description 2-Way Interactive Technical Support Ticket Thread with Optimistic UI Mutation
  */
 import * as React from 'react';
 import { Send, CheckCircle2, MessageSquare } from 'lucide-react';
-import { FullTicketRecord, MOCK_TICKETS_DATA } from '@/mocks';
+import { FullTicketRecord } from '@/mocks';
+import {
+  useTicketsQuery,
+  useSendTicketMessageMutation,
+  useUpdateTicketStatusMutation,
+} from '@/hooks';
 import { Button, Input, Badge, AppDialog } from '@/components/common';
 import { FilterSearchHeader, FilterOption } from '@/components/molecular';
-import { toast } from 'sonner';
 
 export interface TicketThreadViewProps {
   userRole?: 'admin' | 'client';
 }
 
 export function TicketThreadView({ userRole = 'admin' }: TicketThreadViewProps): React.JSX.Element {
-  const [tickets, setTickets] = React.useState<FullTicketRecord[]>(MOCK_TICKETS_DATA);
+  const { data: queriedTickets, isLoading } = useTicketsQuery();
+  const tickets = queriedTickets || [];
+
   const [searchValue, setSearchValue] = React.useState<string>('');
   const [activeFilter, setActiveFilter] = React.useState<string>('all');
-  const [selectedTicket, setSelectedTicket] = React.useState<FullTicketRecord | null>(null);
+  const [selectedTicketId, setSelectedTicketId] = React.useState<string | null>(null);
   const [isChatModalOpen, setIsChatModalOpen] = React.useState<boolean>(false);
   const [replyText, setReplyText] = React.useState<string>('');
+
+  const sendMutation = useSendTicketMessageMutation();
+  const updateStatusMutation = useUpdateTicketStatusMutation();
+
+  const selectedTicket = React.useMemo(() => {
+    return tickets.find((t) => t.id === selectedTicketId) || null;
+  }, [tickets, selectedTicketId]);
 
   const filterOptions: FilterOption[] = [
     { id: 'all', label: 'Tất cả Ticket', count: tickets.length },
@@ -52,7 +65,7 @@ export function TicketThreadView({ userRole = 'admin' }: TicketThreadViewProps):
   }, [tickets, activeFilter, searchValue]);
 
   const handleOpenChat = (ticket: FullTicketRecord) => {
-    setSelectedTicket(ticket);
+    setSelectedTicketId(ticket.id);
     setIsChatModalOpen(true);
   };
 
@@ -60,36 +73,25 @@ export function TicketThreadView({ userRole = 'admin' }: TicketThreadViewProps):
     e.preventDefault();
     if (!replyText.trim() || !selectedTicket) return;
 
-    const newMessage = {
-      id: `msg-${Date.now()}`,
+    sendMutation.mutate({
       ticketId: selectedTicket.id,
-      senderName: userRole === 'admin' ? 'Kỹ Thuật Viên Satek' : 'Khách Hàng (An Nam)',
-      senderRole: (userRole === 'admin' ? 'support_agent' : 'client') as 'support_agent' | 'client',
-      content: replyText.trim(),
-      createdAt: new Date().toISOString(),
-    };
+      message: {
+        ticketId: selectedTicket.id,
+        senderName: userRole === 'admin' ? 'Kỹ Thuật Viên Satek' : 'Khách Hàng (An Nam)',
+        senderRole: userRole === 'admin' ? 'support_agent' : 'client',
+        content: replyText.trim(),
+      },
+    });
 
-    const updatedTicket: FullTicketRecord = {
-      ...selectedTicket,
-      status: userRole === 'admin' ? 'in_progress' : 'open',
-      messages: [...selectedTicket.messages, newMessage],
-    };
-
-    setTickets((prev) => prev.map((t) => (t.id === updatedTicket.id ? updatedTicket : t)));
-    setSelectedTicket(updatedTicket);
     setReplyText('');
-    toast.success('Đã gửi phản hồi thành công!');
   };
 
   const handleResolveTicket = () => {
     if (!selectedTicket) return;
-    const updatedTicket: FullTicketRecord = {
-      ...selectedTicket,
+    updateStatusMutation.mutate({
+      ticketId: selectedTicket.id,
       status: 'resolved',
-    };
-    setTickets((prev) => prev.map((t) => (t.id === updatedTicket.id ? updatedTicket : t)));
-    setSelectedTicket(updatedTicket);
-    toast.success('Đã đánh dấu ticket là ĐÃ GIẢI QUYẾT!');
+    });
   };
 
   return (
@@ -104,55 +106,63 @@ export function TicketThreadView({ userRole = 'admin' }: TicketThreadViewProps):
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
         primaryActionLabel="Tạo Ticket Mới"
-        onPrimaryAction={() => toast.info('Chức năng tạo ticket yêu cầu hỗ trợ mới')}
+        onPrimaryAction={() => {}}
       />
 
-      {/* Ticket Cards Grid */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredTickets.map((t) => (
-          <div
-            key={t.id}
-            onClick={() => handleOpenChat(t)}
-            className="flex cursor-pointer flex-col justify-between rounded-2xl border border-surface-border bg-white p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-          >
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-primary">{t.ticketCode}</span>
-                <Badge
-                  variant={
-                    t.status === 'resolved'
-                      ? 'active'
+      {/* Ticket Cards Grid with Loading State */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-44 animate-pulse rounded-2xl bg-slate-100" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredTickets.map((t) => (
+            <div
+              key={t.id}
+              onClick={() => handleOpenChat(t)}
+              className="flex cursor-pointer flex-col justify-between rounded-2xl border border-surface-border bg-white p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-primary">{t.ticketCode}</span>
+                  <Badge
+                    variant={
+                      t.status === 'resolved'
+                        ? 'active'
+                        : t.priority === 'urgent'
+                          ? 'error'
+                          : 'warning'
+                    }
+                  >
+                    {t.status === 'resolved'
+                      ? 'Đã xử lý'
                       : t.priority === 'urgent'
-                        ? 'error'
-                        : 'warning'
-                  }
-                >
-                  {t.status === 'resolved'
-                    ? 'Đã xử lý'
-                    : t.priority === 'urgent'
-                      ? 'Khẩn cấp'
-                      : 'Đang xử lý'}
-                </Badge>
+                        ? 'Khẩn cấp'
+                        : 'Đang xử lý'}
+                  </Badge>
+                </div>
+
+                <h4 className="mt-2 line-clamp-2 text-sm font-bold text-slate-900">{t.subject}</h4>
+                <p className="mt-1 text-xs text-slate-500">
+                  {t.customerName} · {t.department}
+                </p>
               </div>
 
-              <h4 className="mt-2 line-clamp-2 text-sm font-bold text-slate-900">{t.subject}</h4>
-              <p className="mt-1 text-xs text-slate-500">
-                {t.customerName} · {t.department}
-              </p>
+              <div className="mt-4 flex items-center justify-between border-t border-surface-border pt-4 text-[11px] text-slate-400">
+                <span className="flex items-center space-x-1">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  <span>{t.messages.length} tin nhắn</span>
+                </span>
+                <span>Cập nhật: {t.updatedAt.slice(0, 10)}</span>
+              </div>
             </div>
+          ))}
+        </div>
+      )}
 
-            <div className="mt-4 flex items-center justify-between border-t border-surface-border pt-4 text-[11px] text-slate-400">
-              <span className="flex items-center space-x-1">
-                <MessageSquare className="h-3.5 w-3.5" />
-                <span>{t.messages.length} tin nhắn</span>
-              </span>
-              <span>Cập nhật: {t.updatedAt.slice(0, 10)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Interactive 2-Way Chat Modal (z-[10000]) */}
+      {/* Interactive 2-Way Chat Modal */}
       {selectedTicket && (
         <AppDialog
           open={isChatModalOpen}
@@ -162,7 +172,6 @@ export function TicketThreadView({ userRole = 'admin' }: TicketThreadViewProps):
           maxWidthClass="max-w-2xl"
         >
           <div className="space-y-4">
-            {/* Action Bar inside Chat */}
             <div className="flex items-center justify-between border-b border-surface-border pb-3">
               <div className="flex items-center space-x-2">
                 <span className="text-xs font-medium text-slate-500">Trạng thái:</span>
@@ -176,7 +185,8 @@ export function TicketThreadView({ userRole = 'admin' }: TicketThreadViewProps):
                   variant="outline"
                   size="sm"
                   onClick={handleResolveTicket}
-                  className="gap-1.5 text-xs text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50"
+                  disabled={updateStatusMutation.isPending}
+                  className="cursor-pointer gap-1.5 text-xs text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50"
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   <span>Đánh dấu giải quyết</span>
@@ -227,7 +237,8 @@ export function TicketThreadView({ userRole = 'admin' }: TicketThreadViewProps):
               <Button
                 type="submit"
                 variant="primary"
-                className="gap-1.5 bg-primary px-4 font-bold hover:bg-primary-hover"
+                isLoading={sendMutation.isPending}
+                className="cursor-pointer gap-1.5 bg-primary px-4 font-bold hover:bg-primary-hover"
               >
                 <Send className="h-4 w-4" />
                 <span>Gửi</span>

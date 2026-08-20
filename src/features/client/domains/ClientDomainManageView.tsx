@@ -1,49 +1,20 @@
 /**
  * @file ClientDomainManageView.tsx
- * @description Client Domain Names, DNS Records & Security Management View
+ * @description Client Domain Names, DNS Records & Security Management View with Mutation Hook
  */
 import * as React from 'react';
 import { Globe, ShieldCheck, Lock } from 'lucide-react';
+import { useClientDomainsQuery, useToggleDomainAutoRenewMutation } from '@/hooks';
 import { DataTable, ColumnDefinition, Button, Switch } from '@/components/common';
 import { FilterSearchHeader, FilterOption } from '@/components/molecular';
+import { ClientDomainData } from '@/services';
 import { toast } from 'sonner';
 
-export interface ClientDomainItem {
-  id: string;
-  domainName: string;
-  registrar: string;
-  isDnssecEnabled: boolean;
-  isRegistryLocked: boolean;
-  isAutoRenew: boolean;
-  expiresAt: string;
-  status: 'active' | 'expiring_soon' | 'expired';
-}
-
-export const MOCK_CLIENT_DOMAINS: ClientDomainItem[] = [
-  {
-    id: 'c-dom-01',
-    domainName: 'annam.vn',
-    registrar: 'VNNIC / P.A Việt Nam',
-    isDnssecEnabled: true,
-    isRegistryLocked: true,
-    isAutoRenew: true,
-    expiresAt: '2027-05-20',
-    status: 'active',
-  },
-  {
-    id: 'c-dom-02',
-    domainName: 'tencongty.net',
-    registrar: 'VeriSign / P.A Việt Nam',
-    isDnssecEnabled: true,
-    isRegistryLocked: false,
-    isAutoRenew: true,
-    expiresAt: '2026-06-15',
-    status: 'expiring_soon',
-  },
-];
-
 export function ClientDomainManageView(): React.JSX.Element {
-  const [domains, setDomains] = React.useState<ClientDomainItem[]>(MOCK_CLIENT_DOMAINS);
+  const { data: queriedDomains, isLoading } = useClientDomainsQuery();
+  const toggleMutation = useToggleDomainAutoRenewMutation();
+
+  const domains: ClientDomainData[] = queriedDomains || [];
   const [searchValue, setSearchValue] = React.useState<string>('');
   const [activeFilter, setActiveFilter] = React.useState<string>('all');
 
@@ -75,13 +46,10 @@ export function ClientDomainManageView(): React.JSX.Element {
   }, [domains, activeFilter, searchValue]);
 
   const handleToggleAutoRenew = (domainId: string, currentVal: boolean) => {
-    setDomains((prev) =>
-      prev.map((d) => (d.id === domainId ? { ...d, isAutoRenew: !currentVal } : d))
-    );
-    toast.success(`Đã ${!currentVal ? 'bật' : 'tắt'} tính năng Tự động gia hạn tên miền!`);
+    toggleMutation.mutate({ id: domainId, isAutoRenew: !currentVal });
   };
 
-  const columns: ColumnDefinition<ClientDomainItem>[] = [
+  const columns: ColumnDefinition<ClientDomainData>[] = [
     {
       key: 'domainName',
       header: 'TÊN MIỀN',
@@ -149,7 +117,7 @@ export function ClientDomainManageView(): React.JSX.Element {
           variant="outline"
           size="sm"
           onClick={() => toast.info('Mở cấu hình DNS Record')}
-          className="text-xs"
+          className="cursor-pointer text-xs"
         >
           Quản lý DNS
         </Button>
@@ -172,7 +140,12 @@ export function ClientDomainManageView(): React.JSX.Element {
         onPrimaryAction={() => toast.info('Chức năng tìm kiếm và đăng ký tên miền mới')}
       />
 
-      <DataTable columns={columns} data={filteredDomains} keyExtractor={(row) => row.id} />
+      <DataTable
+        columns={columns}
+        data={filteredDomains}
+        keyExtractor={(row) => row.id}
+        isLoading={isLoading}
+      />
     </div>
   );
 }

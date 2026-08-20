@@ -1,57 +1,22 @@
 /**
  * @file FinanceMisaView.tsx
- * @description Admin Finance, Invoices & MISA Accounting Sync Management View
+ * @description Admin Finance, VAT Invoices & MISA Reconciliation View with Mutation Hook
  */
 import * as React from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, FileSpreadsheet } from 'lucide-react';
 import { MisaReconciliationRecord } from '@/types';
-import { MOCK_MISA_RECONCILIATION_LIST } from '@/mocks';
-import {
-  MetricSummaryCards,
-  MetricCardItem,
-  FilterSearchHeader,
-  FilterOption,
-} from '@/components/molecular';
+import { useMisaRecordsQuery, useSyncAllMisaMutation } from '@/hooks';
 import { DataTable, ColumnDefinition, Badge, Button } from '@/components/common';
+import { FilterSearchHeader, FilterOption } from '@/components/molecular';
 import { formatVND } from '@/utils';
-import { toast } from 'sonner';
 
 export function FinanceMisaView(): React.JSX.Element {
+  const { data: queriedRecords, isLoading } = useMisaRecordsQuery();
+  const syncMutation = useSyncAllMisaMutation();
+
+  const records: MisaReconciliationRecord[] = queriedRecords || [];
   const [searchValue, setSearchValue] = React.useState<string>('');
   const [activeFilter, setActiveFilter] = React.useState<string>('all');
-  const [records] = React.useState<MisaReconciliationRecord[]>(MOCK_MISA_RECONCILIATION_LIST);
-  const [isSyncing, setIsSyncing] = React.useState<boolean>(false);
-
-  const metrics: MetricCardItem[] = [
-    {
-      id: 'm-rev-tot',
-      label: 'DOANH THU THÁNG NÀY',
-      value: '489.200.000 ₫',
-      description: '+18.5% so với cùng kỳ',
-      variant: 'emerald',
-    },
-    {
-      id: 'm-inv-count',
-      label: 'HÓA ĐƠN ĐÃ XUẤT',
-      value: '342 hóa đơn',
-      description: 'Tổng tiền thuế VAT: 44.472.000 ₫',
-      variant: 'default',
-    },
-    {
-      id: 'm-misa-sync',
-      label: 'ĐỒNG BỘ MISA',
-      value: '340/342 (99.4%)',
-      description: '2 hóa đơn đang chờ đối soát',
-      variant: 'amber',
-    },
-    {
-      id: 'm-float',
-      label: 'TỔNG SỐ DƯ VÍ CLIENT',
-      value: '1.250.000.000 ₫',
-      description: 'Tiền ký quỹ an toàn',
-      variant: 'sky',
-    },
-  ];
 
   const filterOptions: FilterOption[] = [
     { id: 'all', label: 'Tất cả hóa đơn', count: records.length },
@@ -62,7 +27,7 @@ export function FinanceMisaView(): React.JSX.Element {
     },
     {
       id: 'pending',
-      label: 'Chờ đối soát',
+      label: 'Chờ đồng bộ',
       count: records.filter((r) => r.misaSyncStatus === 'pending').length,
     },
   ];
@@ -77,30 +42,27 @@ export function FinanceMisaView(): React.JSX.Element {
             : r.misaSyncStatus === 'pending';
       const matchSearch =
         r.invoiceCode.toLowerCase().includes(searchValue.toLowerCase()) ||
-        r.customerName.toLowerCase().includes(searchValue.toLowerCase()) ||
-        r.taxCode.includes(searchValue);
+        r.taxCode.includes(searchValue) ||
+        r.customerName.toLowerCase().includes(searchValue.toLowerCase());
       return matchFilter && matchSearch;
     });
   }, [records, activeFilter, searchValue]);
 
-  const handleSyncMisaAll = async () => {
-    try {
-      setIsSyncing(true);
-      await new Promise((res) => setTimeout(res, 800));
-      toast.success('Đã đối soát và đồng bộ toàn bộ chứng từ sang phần mềm MISA thành công!');
-    } catch {
-      toast.error('Lỗi kết nối cổng API MISA.');
-    } finally {
-      setIsSyncing(false);
-    }
+  const handleSyncAll = () => {
+    syncMutation.mutate();
   };
 
   const columns: ColumnDefinition<MisaReconciliationRecord>[] = [
     {
       key: 'invoiceCode',
-      header: 'SỐ HÓA ĐƠN',
+      header: 'SỐ HÓA ĐƠN GTGT',
       width: '20%',
-      render: (row) => <span className="font-bold text-slate-900">{row.invoiceCode}</span>,
+      render: (row) => (
+        <div>
+          <p className="font-bold text-slate-900">{row.invoiceCode}</p>
+          <p className="text-[11px] text-slate-400">Ngày: {row.createdAt.slice(0, 10)}</p>
+        </div>
+      ),
     },
     {
       key: 'customer',
@@ -115,23 +77,28 @@ export function FinanceMisaView(): React.JSX.Element {
     },
     {
       key: 'amount',
-      header: 'GIÁ TRỊ / VAT',
-      width: '20%',
+      header: 'GIÁ TRỊ HÓA ĐƠN',
+      width: '18%',
       render: (row) => (
         <div>
-          <p className="font-bold text-slate-900">{formatVND(row.amount)}</p>
-          <p className="text-xs text-emerald-600">VAT: {formatVND(row.vatAmount)}</p>
+          <p className="font-black text-slate-900">{formatVND(row.amount)}</p>
+          <p className="text-[10px] text-slate-400">VAT: {formatVND(row.vatAmount)}</p>
         </div>
       ),
     },
     {
       key: 'misaStatus',
-      header: 'ĐỒNG BỘ MISA',
-      width: '16%',
+      header: 'TRẠNG THÁI MISA',
+      width: '18%',
       render: (row) => (
-        <Badge variant={row.misaSyncStatus === 'synced' ? 'active' : 'warning'}>
-          {row.misaSyncStatus === 'synced' ? 'Đã đẩy MISA' : 'Chờ đối soát'}
-        </Badge>
+        <div>
+          <Badge variant={row.misaSyncStatus === 'synced' ? 'active' : 'warning'}>
+            {row.misaSyncStatus === 'synced' ? 'ĐÃ ĐỒNG BỘ' : 'CHỜ ĐỐI SOÁT'}
+          </Badge>
+          {row.misaVoucherNumber && (
+            <p className="mt-0.5 text-[10px] text-slate-400">Số CT: {row.misaVoucherNumber}</p>
+          )}
+        </div>
       ),
     },
     {
@@ -139,14 +106,15 @@ export function FinanceMisaView(): React.JSX.Element {
       header: 'THAO TÁC',
       width: '12%',
       className: 'text-right',
-      render: (row) => (
+      render: () => (
         <Button
           variant="outline"
           size="sm"
-          onClick={() => toast.info(`Tra cứu chứng từ ${row.misaVoucherNumber || row.invoiceCode}`)}
-          className="gap-1 text-xs"
+          onClick={handleSyncAll}
+          disabled={syncMutation.isPending}
+          className="cursor-pointer text-xs hover:border-primary hover:text-primary"
         >
-          <span>Đối soát</span>
+          Đồng bộ
         </Button>
       ),
     },
@@ -154,39 +122,53 @@ export function FinanceMisaView(): React.JSX.Element {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            TÀI CHÍNH & KẾ TOÁN
-          </p>
-          <h1 className="mt-0.5 text-2xl font-black tracking-tight text-slate-900">
-            Đối Soát Tài Chính & Đồng Bộ MISA
-          </h1>
-        </div>
-
-        <Button
-          variant="primary"
-          onClick={handleSyncMisaAll}
-          isLoading={isSyncing}
-          className="gap-2 bg-emerald-600 font-bold shadow-sm hover:bg-emerald-700"
-        >
-          <RefreshCw className="h-4 w-4" />
-          <span>Đồng Bộ Hóa Đơn MISA</span>
-        </Button>
-      </div>
-
-      <MetricSummaryCards metrics={metrics} />
-
       <FilterSearchHeader
-        searchPlaceholder="Tìm số hóa đơn, tên công ty, MST..."
+        categoryLabel="TÀI CHÍNH & KẾ TOÁN"
+        title="Đối Soát Hóa Đơn & Đồng Bộ MISA"
+        searchPlaceholder="Tìm số hóa đơn, MST, tên công ty..."
         searchValue={searchValue}
         onSearchChange={setSearchValue}
         filterOptions={filterOptions}
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
+        primaryActionLabel="Đồng Bộ Tất Cả MISA"
+        onPrimaryAction={handleSyncAll}
       />
 
-      <DataTable columns={columns} data={filteredRecords} keyExtractor={(row) => row.id} />
+      {/* Sync Status Banner */}
+      <div className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-light p-5 sm:flex-row sm:items-center">
+        <div className="flex items-center space-x-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
+            <FileSpreadsheet className="h-5 w-5" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-slate-900">
+              Cổng Kết Nối Phần Mềm Kế Toán MISA SME / AMIS
+            </h4>
+            <p className="text-xs text-slate-600">
+              Đã tự động khớp 340 trên 342 hóa đơn điện tử trong tháng hiện tại
+            </p>
+          </div>
+        </div>
+
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={handleSyncAll}
+          isLoading={syncMutation.isPending}
+          className="cursor-pointer gap-1.5 font-bold"
+        >
+          <RefreshCw className="h-4 w-4" />
+          <span>Kích Hoạt Đối Soát Ngay</span>
+        </Button>
+      </div>
+
+      <DataTable
+        columns={columns}
+        data={filteredRecords}
+        keyExtractor={(row) => row.id}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
