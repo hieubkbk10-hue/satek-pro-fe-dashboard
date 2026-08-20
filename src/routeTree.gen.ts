@@ -17,8 +17,20 @@ import { Route as ClientLayoutRouteImport } from './routes/client/_layout'
 
 const AdminLayoutIndexLazyRouteImport = createFileRoute('/admin/_layout/')()
 const ClientLayoutIndexLazyRouteImport = createFileRoute('/client/_layout/')()
+const AdminLayoutCombosIndexLazyRouteImport = createFileRoute(
+  '/admin/_layout/combos/',
+)()
+const AdminLayoutCustomersIndexLazyRouteImport = createFileRoute(
+  '/admin/_layout/customers/',
+)()
+const AdminLayoutDashboardIndexLazyRouteImport = createFileRoute(
+  '/admin/_layout/dashboard/',
+)()
 const AdminLayoutDomainsIndexLazyRouteImport = createFileRoute(
   '/admin/_layout/domains/',
+)()
+const AdminLayoutFinanceIndexLazyRouteImport = createFileRoute(
+  '/admin/_layout/finance/',
 )()
 const AdminLayoutHostingIndexLazyRouteImport = createFileRoute(
   '/admin/_layout/hosting/',
@@ -26,11 +38,38 @@ const AdminLayoutHostingIndexLazyRouteImport = createFileRoute(
 const AdminLayoutHostingIdLazyRouteImport = createFileRoute(
   '/admin/_layout/hosting/$id',
 )()
+const AdminLayoutOrdersIndexLazyRouteImport = createFileRoute(
+  '/admin/_layout/orders/',
+)()
+const AdminLayoutProductsIndexLazyRouteImport = createFileRoute(
+  '/admin/_layout/products/',
+)()
+const AdminLayoutPromotionsIndexLazyRouteImport = createFileRoute(
+  '/admin/_layout/promotions/',
+)()
+const AdminLayoutTicketsIndexLazyRouteImport = createFileRoute(
+  '/admin/_layout/tickets/',
+)()
 const ClientLayoutCartIndexLazyRouteImport = createFileRoute(
   '/client/_layout/cart/',
 )()
+const ClientLayoutDashboardIndexLazyRouteImport = createFileRoute(
+  '/client/_layout/dashboard/',
+)()
+const ClientLayoutDomainsIndexLazyRouteImport = createFileRoute(
+  '/client/_layout/domains/',
+)()
 const ClientLayoutHostingIndexLazyRouteImport = createFileRoute(
   '/client/_layout/hosting/',
+)()
+const ClientLayoutOrdersIndexLazyRouteImport = createFileRoute(
+  '/client/_layout/orders/',
+)()
+const ClientLayoutTicketsIndexLazyRouteImport = createFileRoute(
+  '/client/_layout/tickets/',
+)()
+const ClientLayoutWalletIndexLazyRouteImport = createFileRoute(
+  '/client/_layout/wallet/',
 )()
 
 const IndexRoute = IndexRouteImport.update({
@@ -62,6 +101,30 @@ const ClientLayoutIndexLazyRoute = ClientLayoutIndexLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/client/_layout/index.lazy').then((d) => d.Route),
 )
+const AdminLayoutCombosIndexLazyRoute =
+  AdminLayoutCombosIndexLazyRouteImport.update({
+    id: '/combos/',
+    path: '/combos/',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/admin/_layout/combos/index.lazy').then((d) => d.Route),
+  )
+const AdminLayoutCustomersIndexLazyRoute =
+  AdminLayoutCustomersIndexLazyRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/admin/_layout/customers/index.lazy').then((d) => d.Route),
+  )
+const AdminLayoutDashboardIndexLazyRoute =
+  AdminLayoutDashboardIndexLazyRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/admin/_layout/dashboard/index.lazy').then((d) => d.Route),
+  )
 const AdminLayoutDomainsIndexLazyRoute =
   AdminLayoutDomainsIndexLazyRouteImport.update({
     id: '/domains/',
@@ -69,6 +132,14 @@ const AdminLayoutDomainsIndexLazyRoute =
     getParentRoute: () => AdminLayoutRoute,
   } as any).lazy(() =>
     import('./routes/admin/_layout/domains/index.lazy').then((d) => d.Route),
+  )
+const AdminLayoutFinanceIndexLazyRoute =
+  AdminLayoutFinanceIndexLazyRouteImport.update({
+    id: '/finance/',
+    path: '/finance/',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/admin/_layout/finance/index.lazy').then((d) => d.Route),
   )
 const AdminLayoutHostingIndexLazyRoute =
   AdminLayoutHostingIndexLazyRouteImport.update({
@@ -86,6 +157,38 @@ const AdminLayoutHostingIdLazyRoute =
   } as any).lazy(() =>
     import('./routes/admin/_layout/hosting/$id.lazy').then((d) => d.Route),
   )
+const AdminLayoutOrdersIndexLazyRoute =
+  AdminLayoutOrdersIndexLazyRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/admin/_layout/orders/index.lazy').then((d) => d.Route),
+  )
+const AdminLayoutProductsIndexLazyRoute =
+  AdminLayoutProductsIndexLazyRouteImport.update({
+    id: '/products/',
+    path: '/products/',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/admin/_layout/products/index.lazy').then((d) => d.Route),
+  )
+const AdminLayoutPromotionsIndexLazyRoute =
+  AdminLayoutPromotionsIndexLazyRouteImport.update({
+    id: '/promotions/',
+    path: '/promotions/',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/admin/_layout/promotions/index.lazy').then((d) => d.Route),
+  )
+const AdminLayoutTicketsIndexLazyRoute =
+  AdminLayoutTicketsIndexLazyRouteImport.update({
+    id: '/tickets/',
+    path: '/tickets/',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/admin/_layout/tickets/index.lazy').then((d) => d.Route),
+  )
 const ClientLayoutCartIndexLazyRoute =
   ClientLayoutCartIndexLazyRouteImport.update({
     id: '/cart/',
@@ -93,6 +196,22 @@ const ClientLayoutCartIndexLazyRoute =
     getParentRoute: () => ClientLayoutRoute,
   } as any).lazy(() =>
     import('./routes/client/_layout/cart/index.lazy').then((d) => d.Route),
+  )
+const ClientLayoutDashboardIndexLazyRoute =
+  ClientLayoutDashboardIndexLazyRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => ClientLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/client/_layout/dashboard/index.lazy').then((d) => d.Route),
+  )
+const ClientLayoutDomainsIndexLazyRoute =
+  ClientLayoutDomainsIndexLazyRouteImport.update({
+    id: '/domains/',
+    path: '/domains/',
+    getParentRoute: () => ClientLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/client/_layout/domains/index.lazy').then((d) => d.Route),
   )
 const ClientLayoutHostingIndexLazyRoute =
   ClientLayoutHostingIndexLazyRouteImport.update({
@@ -102,6 +221,30 @@ const ClientLayoutHostingIndexLazyRoute =
   } as any).lazy(() =>
     import('./routes/client/_layout/hosting/index.lazy').then((d) => d.Route),
   )
+const ClientLayoutOrdersIndexLazyRoute =
+  ClientLayoutOrdersIndexLazyRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => ClientLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/client/_layout/orders/index.lazy').then((d) => d.Route),
+  )
+const ClientLayoutTicketsIndexLazyRoute =
+  ClientLayoutTicketsIndexLazyRouteImport.update({
+    id: '/tickets/',
+    path: '/tickets/',
+    getParentRoute: () => ClientLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/client/_layout/tickets/index.lazy').then((d) => d.Route),
+  )
+const ClientLayoutWalletIndexLazyRoute =
+  ClientLayoutWalletIndexLazyRouteImport.update({
+    id: '/wallet/',
+    path: '/wallet/',
+    getParentRoute: () => ClientLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/client/_layout/wallet/index.lazy').then((d) => d.Route),
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,20 +253,46 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminLayoutIndexLazyRoute
   '/client/': typeof ClientLayoutIndexLazyRoute
   '/admin/hosting/$id': typeof AdminLayoutHostingIdLazyRoute
+  '/admin/combos/': typeof AdminLayoutCombosIndexLazyRoute
+  '/admin/customers/': typeof AdminLayoutCustomersIndexLazyRoute
+  '/admin/dashboard/': typeof AdminLayoutDashboardIndexLazyRoute
   '/admin/domains/': typeof AdminLayoutDomainsIndexLazyRoute
+  '/admin/finance/': typeof AdminLayoutFinanceIndexLazyRoute
   '/admin/hosting/': typeof AdminLayoutHostingIndexLazyRoute
+  '/admin/orders/': typeof AdminLayoutOrdersIndexLazyRoute
+  '/admin/products/': typeof AdminLayoutProductsIndexLazyRoute
+  '/admin/promotions/': typeof AdminLayoutPromotionsIndexLazyRoute
+  '/admin/tickets/': typeof AdminLayoutTicketsIndexLazyRoute
   '/client/cart/': typeof ClientLayoutCartIndexLazyRoute
+  '/client/dashboard/': typeof ClientLayoutDashboardIndexLazyRoute
+  '/client/domains/': typeof ClientLayoutDomainsIndexLazyRoute
   '/client/hosting/': typeof ClientLayoutHostingIndexLazyRoute
+  '/client/orders/': typeof ClientLayoutOrdersIndexLazyRoute
+  '/client/tickets/': typeof ClientLayoutTicketsIndexLazyRoute
+  '/client/wallet/': typeof ClientLayoutWalletIndexLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminLayoutIndexLazyRoute
   '/client': typeof ClientLayoutIndexLazyRoute
   '/admin/hosting/$id': typeof AdminLayoutHostingIdLazyRoute
+  '/admin/combos': typeof AdminLayoutCombosIndexLazyRoute
+  '/admin/customers': typeof AdminLayoutCustomersIndexLazyRoute
+  '/admin/dashboard': typeof AdminLayoutDashboardIndexLazyRoute
   '/admin/domains': typeof AdminLayoutDomainsIndexLazyRoute
+  '/admin/finance': typeof AdminLayoutFinanceIndexLazyRoute
   '/admin/hosting': typeof AdminLayoutHostingIndexLazyRoute
+  '/admin/orders': typeof AdminLayoutOrdersIndexLazyRoute
+  '/admin/products': typeof AdminLayoutProductsIndexLazyRoute
+  '/admin/promotions': typeof AdminLayoutPromotionsIndexLazyRoute
+  '/admin/tickets': typeof AdminLayoutTicketsIndexLazyRoute
   '/client/cart': typeof ClientLayoutCartIndexLazyRoute
+  '/client/dashboard': typeof ClientLayoutDashboardIndexLazyRoute
+  '/client/domains': typeof ClientLayoutDomainsIndexLazyRoute
   '/client/hosting': typeof ClientLayoutHostingIndexLazyRoute
+  '/client/orders': typeof ClientLayoutOrdersIndexLazyRoute
+  '/client/tickets': typeof ClientLayoutTicketsIndexLazyRoute
+  '/client/wallet': typeof ClientLayoutWalletIndexLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -133,10 +302,23 @@ export interface FileRoutesById {
   '/admin/_layout/': typeof AdminLayoutIndexLazyRoute
   '/client/_layout/': typeof ClientLayoutIndexLazyRoute
   '/admin/_layout/hosting/$id': typeof AdminLayoutHostingIdLazyRoute
+  '/admin/_layout/combos/': typeof AdminLayoutCombosIndexLazyRoute
+  '/admin/_layout/customers/': typeof AdminLayoutCustomersIndexLazyRoute
+  '/admin/_layout/dashboard/': typeof AdminLayoutDashboardIndexLazyRoute
   '/admin/_layout/domains/': typeof AdminLayoutDomainsIndexLazyRoute
+  '/admin/_layout/finance/': typeof AdminLayoutFinanceIndexLazyRoute
   '/admin/_layout/hosting/': typeof AdminLayoutHostingIndexLazyRoute
+  '/admin/_layout/orders/': typeof AdminLayoutOrdersIndexLazyRoute
+  '/admin/_layout/products/': typeof AdminLayoutProductsIndexLazyRoute
+  '/admin/_layout/promotions/': typeof AdminLayoutPromotionsIndexLazyRoute
+  '/admin/_layout/tickets/': typeof AdminLayoutTicketsIndexLazyRoute
   '/client/_layout/cart/': typeof ClientLayoutCartIndexLazyRoute
+  '/client/_layout/dashboard/': typeof ClientLayoutDashboardIndexLazyRoute
+  '/client/_layout/domains/': typeof ClientLayoutDomainsIndexLazyRoute
   '/client/_layout/hosting/': typeof ClientLayoutHostingIndexLazyRoute
+  '/client/_layout/orders/': typeof ClientLayoutOrdersIndexLazyRoute
+  '/client/_layout/tickets/': typeof ClientLayoutTicketsIndexLazyRoute
+  '/client/_layout/wallet/': typeof ClientLayoutWalletIndexLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,20 +329,46 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/client/'
     | '/admin/hosting/$id'
+    | '/admin/combos/'
+    | '/admin/customers/'
+    | '/admin/dashboard/'
     | '/admin/domains/'
+    | '/admin/finance/'
     | '/admin/hosting/'
+    | '/admin/orders/'
+    | '/admin/products/'
+    | '/admin/promotions/'
+    | '/admin/tickets/'
     | '/client/cart/'
+    | '/client/dashboard/'
+    | '/client/domains/'
     | '/client/hosting/'
+    | '/client/orders/'
+    | '/client/tickets/'
+    | '/client/wallet/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/client'
     | '/admin/hosting/$id'
+    | '/admin/combos'
+    | '/admin/customers'
+    | '/admin/dashboard'
     | '/admin/domains'
+    | '/admin/finance'
     | '/admin/hosting'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/admin/promotions'
+    | '/admin/tickets'
     | '/client/cart'
+    | '/client/dashboard'
+    | '/client/domains'
     | '/client/hosting'
+    | '/client/orders'
+    | '/client/tickets'
+    | '/client/wallet'
   id:
     | '__root__'
     | '/'
@@ -169,10 +377,23 @@ export interface FileRouteTypes {
     | '/admin/_layout/'
     | '/client/_layout/'
     | '/admin/_layout/hosting/$id'
+    | '/admin/_layout/combos/'
+    | '/admin/_layout/customers/'
+    | '/admin/_layout/dashboard/'
     | '/admin/_layout/domains/'
+    | '/admin/_layout/finance/'
     | '/admin/_layout/hosting/'
+    | '/admin/_layout/orders/'
+    | '/admin/_layout/products/'
+    | '/admin/_layout/promotions/'
+    | '/admin/_layout/tickets/'
     | '/client/_layout/cart/'
+    | '/client/_layout/dashboard/'
+    | '/client/_layout/domains/'
     | '/client/_layout/hosting/'
+    | '/client/_layout/orders/'
+    | '/client/_layout/tickets/'
+    | '/client/_layout/wallet/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,11 +439,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientLayoutIndexLazyRouteImport
       parentRoute: typeof ClientLayoutRoute
     }
+    '/admin/_layout/combos/': {
+      id: '/admin/_layout/combos/'
+      path: '/combos'
+      fullPath: '/admin/combos/'
+      preLoaderRoute: typeof AdminLayoutCombosIndexLazyRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/_layout/customers/': {
+      id: '/admin/_layout/customers/'
+      path: '/customers'
+      fullPath: '/admin/customers/'
+      preLoaderRoute: typeof AdminLayoutCustomersIndexLazyRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/_layout/dashboard/': {
+      id: '/admin/_layout/dashboard/'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard/'
+      preLoaderRoute: typeof AdminLayoutDashboardIndexLazyRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
     '/admin/_layout/domains/': {
       id: '/admin/_layout/domains/'
       path: '/domains'
       fullPath: '/admin/domains/'
       preLoaderRoute: typeof AdminLayoutDomainsIndexLazyRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/_layout/finance/': {
+      id: '/admin/_layout/finance/'
+      path: '/finance'
+      fullPath: '/admin/finance/'
+      preLoaderRoute: typeof AdminLayoutFinanceIndexLazyRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/admin/_layout/hosting/': {
@@ -239,11 +488,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLayoutHostingIdLazyRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
+    '/admin/_layout/orders/': {
+      id: '/admin/_layout/orders/'
+      path: '/orders'
+      fullPath: '/admin/orders/'
+      preLoaderRoute: typeof AdminLayoutOrdersIndexLazyRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/_layout/products/': {
+      id: '/admin/_layout/products/'
+      path: '/products'
+      fullPath: '/admin/products/'
+      preLoaderRoute: typeof AdminLayoutProductsIndexLazyRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/_layout/promotions/': {
+      id: '/admin/_layout/promotions/'
+      path: '/promotions'
+      fullPath: '/admin/promotions/'
+      preLoaderRoute: typeof AdminLayoutPromotionsIndexLazyRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/_layout/tickets/': {
+      id: '/admin/_layout/tickets/'
+      path: '/tickets'
+      fullPath: '/admin/tickets/'
+      preLoaderRoute: typeof AdminLayoutTicketsIndexLazyRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
     '/client/_layout/cart/': {
       id: '/client/_layout/cart/'
       path: '/cart'
       fullPath: '/client/cart/'
       preLoaderRoute: typeof ClientLayoutCartIndexLazyRouteImport
+      parentRoute: typeof ClientLayoutRoute
+    }
+    '/client/_layout/dashboard/': {
+      id: '/client/_layout/dashboard/'
+      path: '/dashboard'
+      fullPath: '/client/dashboard/'
+      preLoaderRoute: typeof ClientLayoutDashboardIndexLazyRouteImport
+      parentRoute: typeof ClientLayoutRoute
+    }
+    '/client/_layout/domains/': {
+      id: '/client/_layout/domains/'
+      path: '/domains'
+      fullPath: '/client/domains/'
+      preLoaderRoute: typeof ClientLayoutDomainsIndexLazyRouteImport
       parentRoute: typeof ClientLayoutRoute
     }
     '/client/_layout/hosting/': {
@@ -253,21 +544,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientLayoutHostingIndexLazyRouteImport
       parentRoute: typeof ClientLayoutRoute
     }
+    '/client/_layout/orders/': {
+      id: '/client/_layout/orders/'
+      path: '/orders'
+      fullPath: '/client/orders/'
+      preLoaderRoute: typeof ClientLayoutOrdersIndexLazyRouteImport
+      parentRoute: typeof ClientLayoutRoute
+    }
+    '/client/_layout/tickets/': {
+      id: '/client/_layout/tickets/'
+      path: '/tickets'
+      fullPath: '/client/tickets/'
+      preLoaderRoute: typeof ClientLayoutTicketsIndexLazyRouteImport
+      parentRoute: typeof ClientLayoutRoute
+    }
+    '/client/_layout/wallet/': {
+      id: '/client/_layout/wallet/'
+      path: '/wallet'
+      fullPath: '/client/wallet/'
+      preLoaderRoute: typeof ClientLayoutWalletIndexLazyRouteImport
+      parentRoute: typeof ClientLayoutRoute
+    }
   }
 }
 
 interface AdminLayoutRouteChildren {
   AdminLayoutIndexLazyRoute: typeof AdminLayoutIndexLazyRoute
   AdminLayoutHostingIdLazyRoute: typeof AdminLayoutHostingIdLazyRoute
+  AdminLayoutCombosIndexLazyRoute: typeof AdminLayoutCombosIndexLazyRoute
+  AdminLayoutCustomersIndexLazyRoute: typeof AdminLayoutCustomersIndexLazyRoute
+  AdminLayoutDashboardIndexLazyRoute: typeof AdminLayoutDashboardIndexLazyRoute
   AdminLayoutDomainsIndexLazyRoute: typeof AdminLayoutDomainsIndexLazyRoute
+  AdminLayoutFinanceIndexLazyRoute: typeof AdminLayoutFinanceIndexLazyRoute
   AdminLayoutHostingIndexLazyRoute: typeof AdminLayoutHostingIndexLazyRoute
+  AdminLayoutOrdersIndexLazyRoute: typeof AdminLayoutOrdersIndexLazyRoute
+  AdminLayoutProductsIndexLazyRoute: typeof AdminLayoutProductsIndexLazyRoute
+  AdminLayoutPromotionsIndexLazyRoute: typeof AdminLayoutPromotionsIndexLazyRoute
+  AdminLayoutTicketsIndexLazyRoute: typeof AdminLayoutTicketsIndexLazyRoute
 }
 
 const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
   AdminLayoutIndexLazyRoute: AdminLayoutIndexLazyRoute,
   AdminLayoutHostingIdLazyRoute: AdminLayoutHostingIdLazyRoute,
+  AdminLayoutCombosIndexLazyRoute: AdminLayoutCombosIndexLazyRoute,
+  AdminLayoutCustomersIndexLazyRoute: AdminLayoutCustomersIndexLazyRoute,
+  AdminLayoutDashboardIndexLazyRoute: AdminLayoutDashboardIndexLazyRoute,
   AdminLayoutDomainsIndexLazyRoute: AdminLayoutDomainsIndexLazyRoute,
+  AdminLayoutFinanceIndexLazyRoute: AdminLayoutFinanceIndexLazyRoute,
   AdminLayoutHostingIndexLazyRoute: AdminLayoutHostingIndexLazyRoute,
+  AdminLayoutOrdersIndexLazyRoute: AdminLayoutOrdersIndexLazyRoute,
+  AdminLayoutProductsIndexLazyRoute: AdminLayoutProductsIndexLazyRoute,
+  AdminLayoutPromotionsIndexLazyRoute: AdminLayoutPromotionsIndexLazyRoute,
+  AdminLayoutTicketsIndexLazyRoute: AdminLayoutTicketsIndexLazyRoute,
 }
 
 const AdminLayoutRouteWithChildren = AdminLayoutRoute._addFileChildren(
@@ -277,13 +605,23 @@ const AdminLayoutRouteWithChildren = AdminLayoutRoute._addFileChildren(
 interface ClientLayoutRouteChildren {
   ClientLayoutIndexLazyRoute: typeof ClientLayoutIndexLazyRoute
   ClientLayoutCartIndexLazyRoute: typeof ClientLayoutCartIndexLazyRoute
+  ClientLayoutDashboardIndexLazyRoute: typeof ClientLayoutDashboardIndexLazyRoute
+  ClientLayoutDomainsIndexLazyRoute: typeof ClientLayoutDomainsIndexLazyRoute
   ClientLayoutHostingIndexLazyRoute: typeof ClientLayoutHostingIndexLazyRoute
+  ClientLayoutOrdersIndexLazyRoute: typeof ClientLayoutOrdersIndexLazyRoute
+  ClientLayoutTicketsIndexLazyRoute: typeof ClientLayoutTicketsIndexLazyRoute
+  ClientLayoutWalletIndexLazyRoute: typeof ClientLayoutWalletIndexLazyRoute
 }
 
 const ClientLayoutRouteChildren: ClientLayoutRouteChildren = {
   ClientLayoutIndexLazyRoute: ClientLayoutIndexLazyRoute,
   ClientLayoutCartIndexLazyRoute: ClientLayoutCartIndexLazyRoute,
+  ClientLayoutDashboardIndexLazyRoute: ClientLayoutDashboardIndexLazyRoute,
+  ClientLayoutDomainsIndexLazyRoute: ClientLayoutDomainsIndexLazyRoute,
   ClientLayoutHostingIndexLazyRoute: ClientLayoutHostingIndexLazyRoute,
+  ClientLayoutOrdersIndexLazyRoute: ClientLayoutOrdersIndexLazyRoute,
+  ClientLayoutTicketsIndexLazyRoute: ClientLayoutTicketsIndexLazyRoute,
+  ClientLayoutWalletIndexLazyRoute: ClientLayoutWalletIndexLazyRoute,
 }
 
 const ClientLayoutRouteWithChildren = ClientLayoutRoute._addFileChildren(

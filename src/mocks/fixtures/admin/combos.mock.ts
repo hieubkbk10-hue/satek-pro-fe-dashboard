@@ -1,0 +1,55 @@
+import { ComboPackage } from '@/types';
+
+export const MOCK_ADMIN_COMBOS: ComboPackage[] = [
+  {
+    id: 'combo-01',
+    code: 'COMBO_STARTUP',
+    name: 'Combo Khởi Nghiệp Toàn Diện',
+    description: 'Tên miền .VN + Hosting Business 4GB + Email Doanh nghiệp 5 user',
+    includedServices: [
+      'Tên miền Quốc gia .VN (1 năm)',
+      'Hosting Business Pro 4GB SSD',
+      'Email Workspace 5 Hộp thư',
+      'Chứng chỉ SSL Pro trọn đời',
+    ],
+    price12Months: 1990000,
+    originalPrice: 3100000,
+    discountPercentage: 35.8,
+    status: 'active',
+    targetAudience: 'Doanh nghiệp mới thành lập, hộ kinh doanh cá thể',
+  },
+  {
+    id: 'combo-02',
+    code: 'COMBO_ENTERPRISE',
+    name: 'Combo Doanh Nghiệp Tăng Trưởng',
+    description: 'Tên miền .COM.VN + Cloud Hosting 16GB + Email Pro 20 user + DNSSEC',
+    includedServices: [
+      'Tên miền Doanh nghiệp .COM.VN',
+      'Cloud Hosting Enterprise 16GB SSD',
+      'Email Pro 20 Hộp thư',
+      'Bảo mật tên miền DNSSEC & Registry Lock',
+    ],
+    price12Months: 4890000,
+    originalPrice: 7500000,
+    discountPercentage: 34.8,
+    status: 'active',
+    targetAudience: 'Doanh nghiệp vừa và lớn, chuỗi bán lẻ, sàn TMĐT',
+  },
+  {
+    id: 'combo-03',
+    code: 'COMBO_ECOMMERCE',
+    name: 'Combo Gian Hàng Online',
+    description: 'Tên miền .VN + Hosting NVMe Tốc độ cao + Web Builder',
+    includedServices: [
+      'Tên miền .VN',
+      'Hosting NVMe 8GB',
+      'Trình dựng Web Builder kéo thả',
+      'Cổng thanh toán tích hợp',
+    ],
+    price12Months: 2790000,
+    originalPrice: 4200000,
+    discountPercentage: 33.5,
+    status: 'active',
+    targetAudience: 'Cửa hàng trực tuyến, thời trang, F&B',
+  },
+];

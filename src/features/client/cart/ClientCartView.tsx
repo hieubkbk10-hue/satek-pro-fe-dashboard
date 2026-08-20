@@ -25,7 +25,31 @@ export function ClientCartView({
     initialSummary.discountCode || 'SATEK10'
   );
   const [isVoucherApplied, setIsVoucherApplied] = React.useState<boolean>(true);
-  const [summary] = React.useState<CartSummaryCalculation>(initialSummary);
+
+  // Derived state calculation for cart summary (Rule RCT002)
+  const summary: CartSummaryCalculation = React.useMemo(() => {
+    let subtotal = 0;
+    cartItems.forEach((group) => {
+      subtotal += group.primaryService.price;
+      group.addons.forEach((addon) => {
+        subtotal += addon.unitPrice * (addon.billingYears || 1);
+      });
+    });
+
+    const discountAmount = isVoucherApplied ? Math.round(subtotal * 0.1) : 0;
+    const taxableAmount = Math.max(0, subtotal - discountAmount);
+    const vatTaxAmount = Math.round(taxableAmount * 0.1);
+    const finalTotalAmount = taxableAmount + vatTaxAmount;
+
+    return {
+      subtotalAmount: subtotal,
+      discountAmount,
+      vatTaxPercentage: 10,
+      vatTaxAmount,
+      finalTotalAmount,
+      discountCode: isVoucherApplied ? 'SATEK10' : undefined,
+    };
+  }, [cartItems, isVoucherApplied]);
 
   const handleApplyVoucher = (e: React.FormEvent) => {
     e.preventDefault();

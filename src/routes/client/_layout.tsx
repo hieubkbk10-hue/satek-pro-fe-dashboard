@@ -6,7 +6,6 @@ import { createFileRoute, Outlet, useNavigate, useLocation } from '@tanstack/rea
 import { ClientLayout } from '@/components/layout';
 import { ROUTE } from '@/constants';
 import { MOCK_CLIENT_CART_ITEMS } from '@/mocks';
-import { toast } from 'sonner';
 
 export const Route = createFileRoute('/client/_layout')({
   component: ClientLayoutRouteComponent,
@@ -30,7 +29,7 @@ function ClientLayoutRouteComponent() {
   };
 
   const handleOpenWallet = () => {
-    toast.info('Số dư tài khoản ví: 5.000.000 đ');
+    navigate({ to: '/client/wallet' });
   };
 
   return (
